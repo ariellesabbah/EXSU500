@@ -1,0 +1,11 @@
+numpy>=1.26
+pandas>=2.1
+openpyxl>=3.1
+pillow>=10.0
+scipy>=1.11
+scikit-learn>=1.4
+scikit-image>=0.22
+matplotlib>=3.8
+tabulate>=0.9
+torch>=2.2
+torchvision>=0.17
