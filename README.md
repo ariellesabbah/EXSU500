@@ -20,4 +20,4 @@ Input:
 Breast ultrasound image
 
 Output:
-BI-RADS category
+Malignant or Benign
