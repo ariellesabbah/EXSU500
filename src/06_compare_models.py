@@ -52,15 +52,19 @@ def main(final: bool) -> None:
 
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(10, 4.5))
     for m, d in preds.items():
+        if d.prob.nunique() < 2:
+            continue  # a constant score (majority baseline) IS the dotted chance line; drawing it adds a fake diagonal
         fpr, tpr, _ = roc_curve(d.label, d.prob)
         prec, rec, _ = precision_recall_curve(d.label, d.prob)
-        a1.plot(fpr, tpr, label=m)
-        a2.plot(rec, prec, label=m)
-    a1.plot([0, 1], [0, 1], "k:", lw=1)
-    a2.axhline(prevalence, color="k", ls=":", lw=1)
+        auc = json.loads((RESULTS_DIR / f"{m}_{stage}_metrics.json").read_text())
+        a1.plot(fpr, tpr, drawstyle="steps-post", label=f"{m} (AUROC {auc['auroc']['value']:.2f})")
+        a2.plot(rec, prec, drawstyle="steps-post", label=f"{m} (AUPRC {auc['auprc']['value']:.2f})")
+    a1.plot([0, 1], [0, 1], "k:", lw=1, label="chance = majority baseline (0.50)")
+    a2.axhline(prevalence, color="k", ls=":", lw=1, label=f"chance = majority baseline ({prevalence:.2f})")
     a1.set(xlabel="1 − specificity", ylabel="Sensitivity", title=f"ROC ({label.split(' (')[0]})")
-    a2.set(xlabel="Recall (sensitivity)", ylabel="Precision (PPV)", title="Precision–recall")
+    a2.set(xlabel="Recall (sensitivity)", ylabel="Precision (PPV)", title="Precision–recall", ylim=(0, 1.02))
     a1.legend(fontsize=7, loc="lower right")
+    a2.legend(fontsize=7, loc="lower left")
     fig.tight_layout()
     fig.savefig(FIGURES_DIR / f"roc_pr_{stage}.png", dpi=200)
     plt.close(fig)

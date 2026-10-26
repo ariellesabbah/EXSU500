@@ -125,8 +125,13 @@ def ckpt_path(seed, fold, mode):
 
 
 # ------------------------------------------------------------------ Grad-CAM
-def gradcam(net, x: torch.Tensor) -> np.ndarray:
-    """Heatmap of where the last conv block's evidence for 'malignant' comes from."""
+def gradcam(net, x: torch.Tensor, toward_malignant: bool) -> np.ndarray:
+    """Raw (unnormalised) Grad-CAM map at IMG_SIZE resolution.
+
+    toward_malignant=True explains evidence FOR malignancy; False explains evidence for
+    benign (the negative logit). Each image is explained in the direction of the model's
+    own call, so a benign prediction does not give an empty map by construction.
+    """
     acts, grads = {}, {}
 
     def keep(module, inputs, output):
@@ -137,28 +142,81 @@ def gradcam(net, x: torch.Tensor) -> np.ndarray:
     net.eval()
     net.zero_grad()
     with torch.enable_grad():
-        net(x.unsqueeze(0).to(DEVICE)).squeeze().backward()
+        logit = net(x.unsqueeze(0).to(DEVICE)).squeeze()
+        (logit if toward_malignant else -logit).backward()
     handle.remove()
     w = grads["g"].mean(dim=(2, 3), keepdim=True)
-    cam = torch.relu((w * acts["a"]).sum(1)).squeeze().detach().cpu().numpy()
-    cam = np.array(Image.fromarray(cam).resize((IMG_SIZE, IMG_SIZE), Image.BILINEAR))
-    return (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)
+    cam = torch.relu((w * acts["a"]).sum(1, keepdim=True))
+    cam = torch.nn.functional.interpolate(cam, size=(IMG_SIZE, IMG_SIZE), mode="bilinear", align_corners=False)
+    return cam.squeeze().detach().cpu().numpy()
 
 
-def save_gradcam_grid(net, table, probs, title, path, input_mode, n=8):
+def lesion_mask_resized(ds: "LesionDataset", i: int) -> np.ndarray:
+    """The radiologist's outline, cropped and resized exactly like the network input."""
+    r = ds.rows.iloc[i]
+    d = Path(r.image_dir)
+    img = load_gray(d / r.Image_filename)
+    mask = load_mask(d, r.Mask_tumor_filename, img.shape)
+    if ds.input_mode == "crop":
+        r0, r1, c0, c1 = lesion_bbox(mask, margin=0.2)
+        mask = mask[r0:r1, c0:c1]
+    m = Image.fromarray(mask.astype(np.uint8) * 255).resize((IMG_SIZE, IMG_SIZE), Image.NEAREST)
+    return np.asarray(m) > 127
+
+
+def cam_inside_lesion(net, table, probs, input_mode) -> dict:
+    """Share of Grad-CAM mass that falls inside the lesion outline, for every image.
+
+    Compared with the share of the image the lesion occupies (what a random map would give).
+    A ratio well above 1 means the network looks at the lesion more than chance.
+    """
     ds = LesionDataset(table, False, input_mode)
-    order = np.argsort(-np.abs(probs - table.label.values))  # most confident errors first...
-    picks = list(order[:n // 2]) + list(np.argsort(np.abs(probs - table.label.values))[:n - n // 2])  # ...then best hits
-    fig, axes = plt.subplots(2, len(picks), figsize=(2.2 * len(picks), 4.6))
-    for j, i in enumerate(picks):
-        x, y = ds[i]
+    inside, area = [], []
+    for i in range(len(ds)):
+        cam = gradcam(net, ds[i][0], toward_malignant=probs[i] >= 0.5)
+        mask = lesion_mask_resized(ds, i)
+        if cam.sum() > 0:
+            inside.append(float(cam[mask].sum() / cam.sum()))
+            area.append(float(mask.mean()))
+    inside, area = np.array(inside), np.array(area)
+    return {"n": int(len(inside)), "mean_cam_share_inside_lesion": float(inside.mean()),
+            "mean_lesion_area_share": float(area.mean()),
+            "ratio_vs_chance": float(inside.mean() / area.mean())}
+
+
+def save_gradcam_grid(net, table, probs, title, path, input_mode, per_group=2):
+    """Two examples each of: true positive, false negative, false positive, true negative.
+
+    Threshold 0.5 is used only to sort examples into these groups for display.
+    All maps share one colour scale, so a weak map looks weak instead of being stretched.
+    The green line is the radiologist's lesion outline.
+    """
+    ds = LesionDataset(table, False, input_mode)
+    y = table.label.values
+    order = np.argsort(probs)
+    groups = [
+        ("true positive", [i for i in order[::-1] if y[i] == 1 and probs[i] >= 0.5][:per_group]),
+        ("false negative", [i for i in order if y[i] == 1 and probs[i] < 0.5][:per_group]),
+        ("false positive", [i for i in order[::-1] if y[i] == 0 and probs[i] >= 0.5][:per_group]),
+        ("true negative", [i for i in order if y[i] == 0 and probs[i] < 0.5][:per_group]),
+    ]
+    picks = [(g, i) for g, idx in groups for i in idx]
+    cams = [gradcam(net, ds[i][0], toward_malignant=probs[i] >= 0.5) for _, i in picks]
+    vmax = max(float(c.max()) for c in cams) or 1.0
+
+    fig, axes = plt.subplots(2, len(picks), figsize=(2.2 * len(picks), 5.0), squeeze=False)
+    for j, ((group, i), cam) in enumerate(zip(picks, cams)):
         base = np.array(ds.raw(i).convert("L").resize((IMG_SIZE, IMG_SIZE)))
-        cam = gradcam(net, x)
-        axes[0, j].imshow(base, cmap="gray"); axes[0, j].axis("off")
-        axes[1, j].imshow(base, cmap="gray"); axes[1, j].imshow(cam, cmap="jet", alpha=0.4); axes[1, j].axis("off")
-        truth = "malig" if y.item() == 1 else "benign"
-        axes[0, j].set_title(f"case {table.iloc[i].Case_ID}\n{truth}, p={probs[i]:.2f}", fontsize=8)
-    fig.suptitle(title + "  (left half: largest errors, right half: most confident correct)", fontsize=9)
+        mask = lesion_mask_resized(ds, i)
+        for row in (0, 1):
+            axes[row, j].imshow(base, cmap="gray")
+            axes[row, j].axis("off")
+        axes[1, j].imshow(cam, cmap="jet", alpha=0.45, vmin=0, vmax=vmax)
+        axes[1, j].contour(mask, levels=[0.5], colors="lime", linewidths=0.8)
+        truth = "malignant" if y[i] == 1 else "benign"
+        axes[0, j].set_title(f"{group}\ncase {table.iloc[i].Case_ID}: {truth}\np(malig) = {probs[i]:.2f}", fontsize=7)
+    fig.suptitle(f"{title}. Heatmaps explain the model's own call; shared colour scale; "
+                 "green = radiologist's outline", fontsize=8)
     fig.tight_layout()
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path, dpi=200)
@@ -175,7 +233,7 @@ def main(args) -> None:
     print(f"Device: {DEVICE}. Input: {args.input}. Seeds: {args.seeds}")
 
     name = f"cnn_resnet18_{args.input}"
-    oof_all, test_all, log = [], [], []
+    oof_all, test_all, log, cam_check = [], [], [], []
     for seed in args.seeds:
         oof_parts, test_probs = [], []
         for fold in folds:
@@ -194,9 +252,13 @@ def main(args) -> None:
             p = predict(net, vl)
             oof_parts.append(pd.DataFrame({"Case_ID": va.Case_ID, "label": va.label, "fold": fold,
                                            "seed": seed, "prob": p}))
-            if args.gradcam and seed == args.seeds[0] and fold == folds[0]:
-                save_gradcam_grid(net, va, p, f"Grad-CAM, validation fold {fold}",
-                                  FIGURES_DIR / f"{name}_gradcam_val.png", args.input)
+            if args.gradcam and seed == args.seeds[0]:
+                # Every validation image is explained by the model that never trained on it.
+                loc = cam_inside_lesion(net, va, p, args.input)
+                cam_check.append({"fold": fold, **loc})
+                if fold == folds[0]:
+                    save_gradcam_grid(net, va, p, f"Grad-CAM, validation fold {fold}",
+                                      FIGURES_DIR / f"{name}_gradcam_val.png", args.input)
             if args.final:
                 test_probs.append(predict(net, DataLoader(LesionDataset(te, False, args.input), batch_size=64)))
                 if args.gradcam and seed == args.seeds[0] and fold == folds[0]:
@@ -208,10 +270,18 @@ def main(args) -> None:
                                           "prob": np.mean(test_probs, axis=0)}))
     if log:
         pd.DataFrame(log).to_csv(RESULTS_DIR / f"{name}_training_log.csv", index=False)
+    if cam_check:
+        cc = pd.DataFrame(cam_check)
+        cc.to_csv(RESULTS_DIR / f"{name}_gradcam_localisation.csv", index=False)
+        share = (cc.mean_cam_share_inside_lesion * cc.n).sum() / cc.n.sum()
+        area = (cc.mean_lesion_area_share * cc.n).sum() / cc.n.sum()
+        print(f"\nGrad-CAM check (seed {args.seeds[0]}, all validation folds, n={cc.n.sum()}): "
+              f"{share:.0%} of heatmap mass lies inside the lesion outline, which covers {area:.0%} "
+              f"of the input on average (ratio {share / area:.2f}; 1.0 = no better than chance).")
 
     # Seed-to-seed variability (the spec asks for runs across several seeds).
     oof_long = pd.concat(oof_all)
-    per_seed = {int(s): roc_auc_score(g.label, g.prob) for s, g in oof_long.groupby("seed")}
+    per_seed = {int(s): float(roc_auc_score(g.label, g.prob)) for s, g in oof_long.groupby("seed")}
     print("\nOOF AUROC per seed:", {k: round(v, 3) for k, v in per_seed.items()},
           f"mean {np.mean(list(per_seed.values())):.3f} ± {np.std(list(per_seed.values())):.3f}")
 
