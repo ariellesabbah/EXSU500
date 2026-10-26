@@ -79,3 +79,33 @@ Malignant or Benign
 └── outputs/
     ├── results/           metric tables and predictions (committed)
     └── figures/           ROC, calibration, feature importance, Grad-CAM (committed)
+```
+## How to reproduce
+
+1. Download the images (.zip) and clinical data (.xlsx) from https://doi.org/10.7937/9WKK-Q141.
+   Unzip both into `data/raw/`.
+2. Install packages: `pip install -r requirements.txt` (Python 3.10+). On Colab, open `notebooks/run_on_colab.ipynb`.
+3. Run the scripts in order:
+
+```bash
+python src/01_prepare_data.py      # checks files, prints dataset summary
+python src/02_make_splits.py       # skipped if splits.csv already exists
+python src/03_baseline.py
+python src/04_classical_ml.py
+python src/05_cnn.py --gradcam     # GPU recommended
+python src/06_compare_models.py
+```
+
+Add `--final` to scripts 03–06 to score the held-out test set. See `GETTING_STARTED.md` for details.
+
+## Contributions (CRediT)
+
+*To be completed*
+
+## Use of generative AI
+
+Claude (Anthropic) was used to draft starter code and that all code, results and citations were checked modified and are understood by the team.
+
+## Licence
+
+Code: MIT (see `LICENSE`). Data: CC-BY 4.0, owned by the dataset authors and not redistributed here.
