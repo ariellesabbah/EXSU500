@@ -14,7 +14,7 @@ Our project aims to develop and compare machine-learning models for predicting t
 
 Why it matters: prompt and accurate diagnosis of breast lesions strongly influence follow-up and biopsy requirement. An AI model capable of predicting the malignancy of a lesion could potentially support more consistent and efficient image interpretation, and minimize unnecessary biopsies and associated complications.
 
-## Task type: Multiclass Image Classification
+## Task type: Binary Image Classification
 
 Input:
 Breast ultrasound image
