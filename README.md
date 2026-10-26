@@ -8,9 +8,6 @@ This project uses the *BREAST-LESION-USG* dataset obtained from The Cancer Imagi
 Source:
 Pawłowska, A., Ćwierz-Pieńkowska, A., Domalik, A., Jaguś, D., Kasprzak, P., Matkowski, R., Fura, Ł., Nowicki, A., & Zolek, N. (2024). A Curated Benchmark Dataset for Ultrasound Based Breast Lesion Analysis (Breast-Lesions-USG) (Version 1) [dataset]. The Cancer Imaging Archive. https://doi.org/10.7937/9WKK-Q141.
 
-256 B-mode images from 256 women (Poland, 2019–2022, 4 scanner types), each with a radiologist's tumour
-outline. After excluding 4 normal cases: **252 lesions — 154 benign, 98 malignant (38.9%)**.
-
 ## Problem: 
 
 Our project aims to develop and compare machine-learning models for predicting the malignancy of breast lesions from ultrasound images.
