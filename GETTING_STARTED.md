@@ -18,7 +18,7 @@ src/
 
 ---
 
-## Step 0 - Put the code in your team repository (data lead)
+## Step 0 - Put the code in your repository (data lead)
 
 1. Copy everything in this folder into your GitHub repository and commit it.
    Each member should then commit their own changes from their own account,
@@ -166,11 +166,4 @@ Two points to state as limitations:
 - **Data lead:** Steps 1, 3, 4. Writes the data description and limitations.
 - **Modelling lead:** Steps 5 and 6. Tunes the feature set and CNN settings on CV.
 - **Writing lead:** Turns the printouts and figures into the Data and Methods sections. Keeps the model card up to date.
-- **Interface lead (optional bonus):** A Gradio app that loads the best checkpoint and shows the probability and Grad-CAM. It must carry the prototype notice.
-
-## Still to add before the final submission
-
-- `MODEL_CARD.md` for your best model (a template is included)
-- `requirements-lock.txt` with exact versions (last cell of the Colab notebook)
-- A CRediT contribution statement and a Use of Generative AI statement in the README
-- The results table and data download instructions in the README
+- **Interface lead (optional bonus):** A Gradio app that loads the best checkpoint and shows the probability and Grad-CAM. It must carry the prototype notice
