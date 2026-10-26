@@ -10,9 +10,9 @@ Pawłowska, A., Ćwierz-Pieńkowska, A., Domalik, A., Jaguś, D., Kasprzak, P., 
 
 ## Problem: 
 
-Our project aims to develop and compare machine-learning models for predicting the BI-RADS category of breast lesions from ultrasound images.
+Our project aims to develop and compare machine-learning models for predicting the malignancy of breast lesions from ultrasound images.
 
-Why it matters: BI-RADS assessment guides the management of breast lesions, including decisions regarding follow-up and biopsy. An AI model capable of predicting BI-RADS categories from ultrasound images could potentially support more consistent and efficient image interpretation and clinical decision-making as well as minimizing unnecessary biopsies and associated complications.
+Why it matters: prompt and accurate diagnosis of breast lesions strongly influence follow-up and biopsy requirement. An AI model capable of predicting the malignancy of a lesion could potentially support more consistent and efficient image interpretation, and minimize unnecessary biopsies and associated complications.
 
 ## Task type: Multiclass Image Classification
 
