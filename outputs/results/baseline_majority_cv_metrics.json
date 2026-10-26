@@ -1,0 +1,57 @@
+{
+  "threshold": 0.3880597014925373,
+  "n": 201,
+  "n_malignant": 78,
+  "auroc": {
+    "value": 0.5,
+    "ci_low": 0.5,
+    "ci_high": 0.5
+  },
+  "auprc": {
+    "value": 0.3880597014925373,
+    "ci_low": 0.32338308457711445,
+    "ci_high": 0.4626865671641791
+  },
+  "sensitivity": {
+    "value": 1.0,
+    "ci_low": 1.0,
+    "ci_high": 1.0
+  },
+  "specificity": {
+    "value": 0.0,
+    "ci_low": 0.0,
+    "ci_high": 0.0
+  },
+  "ppv": {
+    "value": 0.3880597014925373,
+    "ci_low": 0.32338308457711445,
+    "ci_high": 0.4626865671641791
+  },
+  "npv": {
+    "value": NaN,
+    "ci_low": NaN,
+    "ci_high": NaN
+  },
+  "brier": {
+    "value": 0.23746936957006023,
+    "ci_low": 0.2229895299621297,
+    "ci_high": 0.25417687680997997
+  },
+  "tp": 78,
+  "fp": 123,
+  "tn": 0,
+  "fn": 0,
+  "fold_auroc": [
+    0.5,
+    0.5,
+    0.5,
+    0.5,
+    0.5
+  ],
+  "extra": {
+    "features": [
+      "area_px",
+      "depth_width_ratio"
+    ]
+  }
+}
