@@ -1,0 +1,66 @@
+/content/drive/MyDrive/EXSU500test
+===== original =====
+analysis,item,estimate,ci_low,ci_high
+All CV cases: AUROC,LogReg,0.75,0.682,0.816
+All CV cases: AUROC,RandomForest,0.825,0.764,0.879
+All CV cases: AUROC,SVM,0.834,0.775,0.887
+All CV cases: AUROC,ResNet18,0.858,0.806,0.909
+All CV cases: AUROC,ResNet18 minus SVM,0.024,-0.023,0.077
+All CV cases: AUROC,ResNet18 minus RandomForest,0.033,-0.014,0.083
+All CV cases: AUROC,ResNet18 minus LogReg,0.108,0.041,0.176
+All CV cases: AUROC,SVM minus RandomForest,0.009,-0.026,0.045
+All CV cases: AUROC,SVM minus LogReg,0.084,0.023,0.148
+All CV cases: AUROC,RandomForest minus LogReg,0.075,0.01,0.14
+BI-RADS 4a-5: AUROC,LogReg,0.722,0.637,0.796
+BI-RADS 4a-5: AUROC,RandomForest,0.755,0.675,0.835
+BI-RADS 4a-5: AUROC,SVM,0.773,0.696,0.844
+BI-RADS 4a-5: AUROC,ResNet18,0.817,0.745,0.883
+BI-RADS 4a-5: AUROC,ResNet18 minus SVM,0.044,-0.015,0.105
+BI-RADS 4a-5: AUROC,ResNet18 minus RandomForest,0.062,0.001,0.124
+BI-RADS 4a-5: AUROC,ResNet18 minus LogReg,0.095,0.018,0.175
+BI-RADS 4a-5: AUROC,SVM minus RandomForest,0.018,-0.031,0.064
+BI-RADS 4a-5: AUROC,SVM minus LogReg,0.051,-0.021,0.129
+BI-RADS 4a-5: AUROC,RandomForest minus LogReg,0.033,-0.039,0.112
+BI-RADS 4a-5: AUPRC,LogReg,0.766,0.67,0.846
+BI-RADS 4a-5: AUPRC,RandomForest,0.749,0.647,0.856
+BI-RADS 4a-5: AUPRC,SVM,0.791,0.693,0.876
+BI-RADS 4a-5: AUPRC,ResNet18,0.823,0.73,0.904
+BI-RADS 4a-5: AUPRC,ResNet18 minus SVM,0.032,-0.042,0.103
+BI-RADS 4a-5: AUPRC,ResNet18 minus RandomForest,0.075,-0.021,0.156
+BI-RADS 4a-5: AUPRC,ResNet18 minus LogReg,0.057,-0.03,0.148
+BI-RADS 4a-5: AUPRC,SVM minus RandomForest,0.042,-0.027,0.108
+BI-RADS 4a-5: AUPRC,SVM minus LogReg,0.025,-0.049,0.109
+BI-RADS 4a-5: AUPRC,RandomForest minus LogReg,-0.017,-0.093,0.077
+
+===== rerun =====
+analysis,item,estimate,ci_low,ci_high
+All CV cases: AUROC,LogReg,0.75,0.682,0.816
+All CV cases: AUROC,RandomForest,0.825,0.764,0.879
+All CV cases: AUROC,SVM,0.834,0.775,0.887
+All CV cases: AUROC,ResNet18,0.873,0.82,0.92
+All CV cases: AUROC,ResNet18 minus SVM,0.039,-0.007,0.089
+All CV cases: AUROC,ResNet18 minus RandomForest,0.048,0.001,0.101
+All CV cases: AUROC,ResNet18 minus LogReg,0.123,0.056,0.189
+All CV cases: AUROC,SVM minus RandomForest,0.009,-0.026,0.045
+All CV cases: AUROC,SVM minus LogReg,0.084,0.023,0.148
+All CV cases: AUROC,RandomForest minus LogReg,0.075,0.01,0.14
+BI-RADS 4a-5: AUROC,LogReg,0.722,0.637,0.796
+BI-RADS 4a-5: AUROC,RandomForest,0.755,0.675,0.835
+BI-RADS 4a-5: AUROC,SVM,0.773,0.696,0.844
+BI-RADS 4a-5: AUROC,ResNet18,0.839,0.77,0.902
+BI-RADS 4a-5: AUROC,ResNet18 minus SVM,0.066,0.006,0.125
+BI-RADS 4a-5: AUROC,ResNet18 minus RandomForest,0.084,0.019,0.145
+BI-RADS 4a-5: AUROC,ResNet18 minus LogReg,0.117,0.035,0.202
+BI-RADS 4a-5: AUROC,SVM minus RandomForest,0.018,-0.031,0.064
+BI-RADS 4a-5: AUROC,SVM minus LogReg,0.051,-0.021,0.129
+BI-RADS 4a-5: AUROC,RandomForest minus LogReg,0.033,-0.039,0.112
+BI-RADS 4a-5: AUPRC,LogReg,0.766,0.67,0.846
+BI-RADS 4a-5: AUPRC,RandomForest,0.749,0.647,0.856
+BI-RADS 4a-5: AUPRC,SVM,0.791,0.693,0.876
+BI-RADS 4a-5: AUPRC,ResNet18,0.846,0.76,0.918
+BI-RADS 4a-5: AUPRC,ResNet18 minus SVM,0.054,-0.014,0.12
+BI-RADS 4a-5: AUPRC,ResNet18 minus RandomForest,0.097,0.007,0.171
+BI-RADS 4a-5: AUPRC,ResNet18 minus LogReg,0.08,-0.003,0.166
+BI-RADS 4a-5: AUPRC,SVM minus RandomForest,0.042,-0.027,0.108
+BI-RADS 4a-5: AUPRC,SVM minus LogReg,0.025,-0.049,0.109
+BI-RADS 4a-5: AUPRC,RandomForest minus LogReg,-0.017,-0.093,0.077
