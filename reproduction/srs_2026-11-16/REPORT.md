@@ -40,3 +40,11 @@ Values are point estimates with 95% bootstrap confidence intervals. Threshold ch
 - GPU stuck on "Connecting" for a while; worked on retry.
 - cuBLAS "no current CUDA context" UserWarning during the CNN: harmless.
 - Suggest GETTING_STARTED.md mention: upload the whole folder, `%cd` after every restart, and the data/raw layout.
+
+## Paired bootstrap on CV predictions, both CNN runs (ΔAUROC, 95% CI):
+
+All cases, ResNet−SVM: +0.024 (−0.023, 0.077) original vs +0.039 (−0.007, 0.089) rerun
+BI-RADS 4a–5 (n=146), ResNet−SVM: +0.044 (−0.015, 0.105) vs +0.066 (0.006, 0.125)
+ResNet−RF, all cases: +0.033 (−0.014, 0.083) vs +0.048 (0.001, 0.101)
+
+The significance of the ResNet advantage flips between two runs of the same code, so I suggest: (1) PROTOCOL.md fixes, before the test run, which checkpoints/predictions are official and the rule for choosing them (not based on which run looks better); (2) ResNet-18 vs SVM is the single primary test-set comparison, with everything else exploratory; (3) the manuscript reports the run-to-run variability in Limitations. Possible fix: seed settings or determinism flags (your call), or reporting the mean across several full reruns.
