@@ -15,6 +15,18 @@ all 15 checkpoints were trained in this session (~1.5–2 min each).
 - Grad-CAM: 42% of heatmap mass inside the lesion outline, which covers
   35% of the input (ratio 1.19).
 
+  ### Cross-validation (out-of-fold, train/validation set)
+
+Values are point estimates with 95% bootstrap confidence intervals. Threshold chosen on cross-validation for sensitivity ≥ 0.90.
+
+| Model             | AUROC               | AUPRC               | Sensitivity         | Specificity         |   Brier |   Threshold |
+|:------------------|:--------------------|:--------------------|:--------------------|:--------------------|--------:|------------:|
+| baseline_majority | 0.500 (0.500–0.500) | 0.388 (0.323–0.463) | 1.000 (1.000–1.000) | 0.000 (0.000–0.000) |   0.237 |       0.388 |
+| baseline_logreg   | 0.750 (0.684–0.816) | 0.655 (0.545–0.772) | 0.936 (0.878–0.987) | 0.374 (0.290–0.462) |   0.202 |       0.295 |
+| random_forest     | 0.825 (0.763–0.880) | 0.725 (0.616–0.838) | 0.910 (0.843–0.970) | 0.439 (0.355–0.530) |   0.172 |       0.299 |
+| svm               | 0.834 (0.773–0.887) | 0.763 (0.664–0.858) | 0.923 (0.859–0.975) | 0.520 (0.435–0.608) |   0.16  |       0.224 |
+| cnn_resnet18_crop | 0.873 (0.819–0.921) | 0.790 (0.690–0.879) | 0.910 (0.842–0.970) | 0.715 (0.635–0.793) |   0.147 |       0.413 |
+
 ## Questions for the Modeling Lead
 1. Does the logistic regression use all 17 features? The log lists 17, the README says size + depth/width ratio.
 2. Is the best epoch picked on the same fold that is scored?
